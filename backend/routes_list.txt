@@ -1,0 +1,16 @@
+﻿
+  GET|HEAD        api/admin/dashboard Admin\DashboardContΓÇª
+  GET|HEAD        api/admin/students students.index ΓÇ║ Admin\StudentContrΓÇª
+  POST            api/admin/students students.store ΓÇ║ Admin\StudentContrΓÇª
+  GET|HEAD        api/admin/students/{student} students.show ΓÇ║ Admin\SΓÇª
+  PUT|PATCH       api/admin/students/{student} students.update ΓÇ║ Admin\StuΓÇª
+  DELETE          api/admin/students/{student} students.destroy ΓÇ║ Admin\StudΓÇª
+  POST            api/auth/login Auth\AuthControlleΓÇª
+  POST            api/auth/logout Auth\AuthControlleΓÇª
+  GET|HEAD        api/auth/profile Auth\AuthControlleΓÇª
+  POST            api/auth/refresh Auth\AuthControlleΓÇª
+  GET|HEAD        api/student/dashboard Student\DashboardCoΓÇª
+  GET|HEAD        api/teacher/dashboard Teacher\DashboardCoΓÇª
+
+        Showing [12] routes
+
