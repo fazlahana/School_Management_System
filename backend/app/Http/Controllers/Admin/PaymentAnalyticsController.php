@@ -44,12 +44,13 @@ class PaymentAnalyticsController extends Controller
         ]);
     }
 
-    public function getOverdueStudents()
+    public function getOverdueStudents(Request $request)
     {
         $overdue = Invoice::with('student.user')
             ->where('status', '!=', 'paid')
             ->where('due_date', '<', now())
-            ->get();
+            ->latest()
+            ->paginate($request->per_page ?? 15);
             
         return response()->json($overdue);
     }

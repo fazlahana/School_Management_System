@@ -167,31 +167,8 @@ const AdminDashboard = () => {
 
                 {/* Right Column Grid */}
                 <div className="space-y-6">
-                    {/* Quick Management */}
-                    <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm p-4">
-                        <h3 className="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider mb-3">Quick Actions</h3>
-                        <div className="grid grid-cols-2 gap-3">
-                            <Link to="/admin/students?action=add" className="flex flex-col items-center justify-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all group shadow-sm hover:shadow text-center">
-                                <Users size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-blue-600 transition-colors mb-2" />
-                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">Add Student</span>
-                            </Link>
-                            <Link to="/admin/teachers?action=add" className="flex flex-col items-center justify-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 hover:bg-white dark:hover:bg-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 transition-all group shadow-sm hover:shadow text-center">
-                                <UserCheck size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-emerald-600 transition-colors mb-2" />
-                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">Add Teacher</span>
-                            </Link>
-                            <Link to="/admin/payments" className="flex flex-col items-center justify-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 hover:bg-white dark:hover:bg-slate-800 hover:border-indigo-500 dark:hover:border-indigo-500 transition-all group shadow-sm hover:shadow text-center">
-                                <TrendingUp size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-indigo-600 transition-colors mb-2" />
-                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">New Invoice</span>
-                            </Link>
-                            <Link to="/admin/classes" className="flex flex-col items-center justify-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 hover:bg-white dark:hover:bg-slate-800 hover:border-amber-500 dark:hover:border-amber-500 transition-all group shadow-sm hover:shadow text-center">
-                                <BookOpen size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-amber-600 transition-colors mb-2" />
-                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">Classes</span>
-                            </Link>
-                        </div>
-                    </div>
-
                     {/* Upcoming Events/Exams */}
-                    <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col h-full">
+                    <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col">
                         <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
                             <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
                                 <Bell size={16} className="text-slate-400" />
@@ -225,6 +202,37 @@ const AdminDashboard = () => {
                                     <p className="text-xs text-slate-500 dark:text-slate-400">No upcoming exams.</p>
                                 </div>
                             )}
+                        </div>
+                    </div>
+
+                    {/* Quick Management - Moved Below */}
+                    <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm p-4">
+                        <h3 className="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider mb-3">Quick Actions</h3>
+                        <div className="grid grid-cols-2 gap-3">
+                            <Link to="/admin/students?action=add" className="flex flex-col items-center justify-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all group shadow-sm hover:shadow text-center">
+                                <Users size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-blue-600 transition-colors mb-2" />
+                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">Add Student</span>
+                            </Link>
+                            <Link to="/admin/teachers?action=add" className="flex flex-col items-center justify-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 hover:bg-white dark:hover:bg-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 transition-all group shadow-sm hover:shadow text-center">
+                                <UserCheck size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-emerald-600 transition-colors mb-2" />
+                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">Add Teacher</span>
+                            </Link>
+                            <Link to="/admin/payments" className="flex flex-col items-center justify-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 hover:bg-white dark:hover:bg-slate-800 hover:border-indigo-500 dark:hover:border-indigo-500 transition-all group shadow-sm hover:shadow text-center">
+                                <TrendingUp size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-indigo-600 transition-colors mb-2" />
+                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">New Invoice</span>
+                            </Link>
+                            <Link to="/admin/exams" className="flex flex-col items-center justify-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 hover:bg-white dark:hover:bg-slate-800 hover:border-orange-500 dark:hover:border-orange-500 transition-all group shadow-sm hover:shadow text-center">
+                                <Calendar size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-orange-600 transition-colors mb-2" />
+                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">Schedule Exam</span>
+                            </Link>
+                            <Link to="/admin/classes" className="flex flex-col items-center justify-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 hover:bg-white dark:hover:bg-slate-800 hover:border-amber-500 dark:hover:border-amber-500 transition-all group shadow-sm hover:shadow text-center">
+                                <BookOpen size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-amber-600 transition-colors mb-2" />
+                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">Classes</span>
+                            </Link>
+                            <Link to="/admin/settings" className="flex flex-col items-center justify-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 hover:bg-white dark:hover:bg-slate-800 hover:border-slate-500 dark:hover:border-slate-500 transition-all group shadow-sm hover:shadow text-center">
+                                <Bell size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-slate-600 transition-colors mb-2" />
+                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">Settings</span>
+                            </Link>
                         </div>
                     </div>
                 </div>

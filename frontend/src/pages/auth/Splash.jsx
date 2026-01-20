@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { GraduationCap } from 'lucide-react';
+import { API_BASE_URL } from '../../services/api';
 
 const Splash = () => {
     const navigate = useNavigate();
@@ -14,7 +15,7 @@ const Splash = () => {
         // Subtle delay for content entry
         const contentTimer = setTimeout(() => setShowContent(true), 100);
 
-        // Redirection timer
+        // Redirection timer - reduced to 800ms for better performance
         const redirectTimer = setTimeout(() => {
             if (isAuthenticated && user) {
                 if (user.role === 'admin') navigate('/admin/dashboard');
@@ -24,7 +25,7 @@ const Splash = () => {
             } else {
                 navigate('/login');
             }
-        }, 3500);
+        }, 800);
 
         return () => {
             clearTimeout(contentTimer);
@@ -45,7 +46,7 @@ const Splash = () => {
                     <div className="relative z-10 w-32 h-32 bg-white/10 backdrop-blur-3xl border border-white/20 rounded-3xl flex items-center justify-center shadow-2xl overflow-hidden">
                         {settings?.school_logo ? (
                             <img
-                                src={`http://localhost:8000${settings.school_logo}`}
+                                src={`${API_BASE_URL}${settings.school_logo}`}
                                 alt="Logo"
                                 className="w-24 h-24 object-cover rounded-2xl animate-logo-pop"
                             />

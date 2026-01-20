@@ -85,26 +85,60 @@ const AdminPayments = () => {
     });
 
     useEffect(() => {
-        fetchInitialData();
+        // Initial load for dashboard and required dropdown data
+        fetchSummary();
+        fetchClasses();
     }, []);
 
-    const fetchInitialData = async () => {
-        setLoading(true);
+    useEffect(() => {
+        // Fetch tab-specific data when tab changes
+        if (activeTab === 'invoices' && invoices.length === 0) fetchInvoices();
+        if (activeTab === 'templates' && feeStructures.length === 0) fetchFeeStructures();
+        if (activeTab === 'overdue' && overdueList.length === 0) fetchOverdue();
+    }, [activeTab]);
+
+    const fetchSummary = async () => {
         try {
-            const [sumRes, invRes, feeRes, clsRes, overRes] = await Promise.all([
-                api.get('/admin/accounting/summary'),
-                api.get('/admin/accounting/invoices'),
-                api.get('/admin/accounting/fee-structures'),
-                api.get('/admin/classes'),
-                api.get('/admin/accounting/overdue')
-            ]);
-            setSummary(sumRes.data);
-            setInvoices(invRes.data.data || []);
-            setFeeStructures(feeRes.data);
-            setClasses(clsRes.data.data || []);
-            setOverdueList(overRes.data);
+            const response = await api.get('/admin/accounting/summary');
+            setSummary(response.data);
         } catch (error) {
-            toast.error('Failed to load financial data');
+            console.error('Error fetching summary:', error);
+        }
+    };
+
+    const fetchInvoices = async () => {
+        try {
+            const response = await api.get('/admin/accounting/invoices');
+            setInvoices(response.data.data || []);
+        } catch (error) {
+            console.error('Error fetching invoices:', error);
+        }
+    };
+
+    const fetchFeeStructures = async () => {
+        try {
+            const response = await api.get('/admin/accounting/fee-structures');
+            setFeeStructures(response.data);
+        } catch (error) {
+            console.error('Error fetching fee structures:', error);
+        }
+    };
+
+    const fetchClasses = async () => {
+        try {
+            const response = await api.get('/admin/classes');
+            setClasses(response.data.data || []);
+        } catch (error) {
+            console.error('Error fetching classes:', error);
+        }
+    };
+
+    const fetchOverdue = async () => {
+        try {
+            const response = await api.get('/admin/accounting/overdue');
+            setOverdueList(response.data.data || []); // Adjusted for paginated response
+        } catch (error) {
+            console.error('Error fetching overdue:', error);
         } finally {
             setLoading(false);
         }
@@ -148,7 +182,7 @@ const AdminPayments = () => {
         try {
             await api.post('/admin/accounting/invoices', invoiceForm);
             setIsInvoiceModalOpen(false);
-            fetchInitialData();
+            fetchInvoices();
             setInvoiceForm({ student_id: '', title: '', total_amount: '', due_date: '' });
             toast.success('Invoice created successfully');
             toast.dismiss(loadToast);
@@ -173,7 +207,9 @@ const AdminPayments = () => {
             });
 
             setIsPaymentModalOpen(false);
-            fetchInitialData();
+            fetchSummary(); // Refresh stats
+            if (activeTab === 'invoices') fetchInvoices();
+            if (activeTab === 'overdue') fetchOverdue();
             if (selectedClassId) fetchClassPayments(selectedClassId); // Refresh class view if active
 
             toast.success('Payment recorded successfully');
@@ -196,7 +232,7 @@ const AdminPayments = () => {
         try {
             await api.post('/admin/accounting/fee-structures', feeForm);
             setIsFeeModalOpen(false);
-            fetchInitialData();
+            fetchFeeStructures();
             toast.success('Fee structure saved');
             toast.dismiss(loadToast);
         } catch (error) {
@@ -211,7 +247,7 @@ const AdminPayments = () => {
             const loadToast = toast.loading('Deleting...');
             try {
                 await api.delete(`/admin/accounting/fee-structures/${id}`);
-                fetchInitialData();
+                fetchFeeStructures();
                 toast.success('Deleted successfully');
                 toast.dismiss(loadToast);
             } catch (error) {
@@ -265,7 +301,8 @@ const AdminPayments = () => {
             const loadToast = toast.loading('Deleting invoice...');
             try {
                 await api.delete(`/admin/accounting/invoices/${id}`);
-                fetchInitialData();
+                if (activeTab === 'invoices') fetchInvoices();
+                if (activeTab === 'overdue') fetchOverdue();
                 toast.success('Invoice deleted successfully');
                 toast.dismiss(loadToast);
             } catch (error) {
