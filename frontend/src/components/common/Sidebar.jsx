@@ -19,6 +19,7 @@ import {
     Plus
 } from 'lucide-react';
 import classNames from 'classnames';
+import { API_BASE_URL } from '../../services/api';
 
 const Sidebar = ({ isOpen }) => {
     const { user, logout, role } = useAuth();
@@ -105,7 +106,7 @@ const Sidebar = ({ isOpen }) => {
             <div className="flex items-center px-4 h-16 border-b border-slate-700 overflow-hidden">
                 {settings?.school_logo ? (
                     <img
-                        src={`http://localhost:8000${settings.school_logo}`}
+                        src={`${API_BASE_URL}${settings.school_logo}`}
                         alt="Logo"
                         className={classNames("h-10 w-10 rounded-lg object-cover transition-all duration-300", { "mr-3": isOpen })}
                     />

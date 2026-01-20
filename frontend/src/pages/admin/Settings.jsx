@@ -19,6 +19,7 @@ import {
     FileCheck
 } from 'lucide-react';
 import classNames from 'classnames';
+import { API_BASE_URL } from '../../services/api';
 
 const Settings = () => {
     const { toast } = useNotification();
@@ -199,7 +200,7 @@ const Settings = () => {
                                                     {logoPreview ? (
                                                         <img src={logoPreview} alt="Preview" className="w-full h-full object-cover" />
                                                     ) : settings?.school_logo ? (
-                                                        <img src={`http://localhost:8000${settings.school_logo}`} alt="Logo" className="w-full h-full object-cover" />
+                                                        <img src={`${API_BASE_URL}${settings.school_logo}`} alt="Logo" className="w-full h-full object-cover" />
                                                     ) : (
                                                         <div className="text-center p-2">
                                                             <span className="block font-bold text-slate-400 text-xs">YOUR LOGO</span>
@@ -332,7 +333,7 @@ const Settings = () => {
                                                 {logoPreview ? (
                                                     <img src={logoPreview} alt="Preview" className="w-full h-full object-cover" />
                                                 ) : settings?.school_logo ? (
-                                                    <img src={`http://localhost:8000${settings.school_logo}`} alt="Logo" className="w-full h-full object-cover" />
+                                                    <img src={`${API_BASE_URL}${settings.school_logo}`} alt="Logo" className="w-full h-full object-cover" />
                                                 ) : (
                                                     <div className="text-center p-2">
                                                         <span className="block font-bold text-slate-400 text-xs">YOUR LOGO</span>
