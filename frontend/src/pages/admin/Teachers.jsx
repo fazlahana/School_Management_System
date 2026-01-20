@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import api from '../../services/api';
 import Modal from '../../components/common/Modal';
 import { useNotification } from '../../hooks/useNotification';
@@ -14,11 +15,14 @@ import {
     Edit2,
     Trash2,
     BookOpen,
-    Check
+    Check,
+    ChevronRight,
+    UserPlus
 } from 'lucide-react';
 
 const AdminTeachers = () => {
     const { toast, alert } = useNotification();
+    const location = useLocation();
     const [teachers, setTeachers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -27,6 +31,7 @@ const AdminTeachers = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
+        password: '',
         employee_code: '',
         specialization: '',
         status: 'pending'
@@ -41,11 +46,25 @@ const AdminTeachers = () => {
     const [selectedIds, setSelectedIds] = useState([]);
     const [isBulkUpdateModalOpen, setIsBulkUpdateModalOpen] = useState(false);
     const [bulkSpecialization, setBulkSpecialization] = useState('');
+    const [isSelectTeacherModalOpen, setIsSelectTeacherModalOpen] = useState(false);
 
     useEffect(() => {
         fetchTeachers();
         fetchAllSubjects();
     }, []);
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        if (params.get('action') === 'add') {
+            if (!isModalOpen) {
+                handleOpenModal();
+            }
+        } else if (params.get('action') === 'manage_subjects') {
+            if (!isSelectTeacherModalOpen && !isSubjectModalOpen) {
+                setIsSelectTeacherModalOpen(true);
+            }
+        }
+    }, [location.search]);
 
     const fetchAllSubjects = async () => {
         try {
@@ -122,6 +141,7 @@ const AdminTeachers = () => {
             setFormData({
                 name: teacher.user?.name || '',
                 email: teacher.user?.email || '',
+                password: '',
                 employee_code: teacher.employee_code || '',
                 specialization: teacher.specialization || '',
                 status: teacher.user?.status || 'pending'
@@ -131,6 +151,7 @@ const AdminTeachers = () => {
             setFormData({
                 name: '',
                 email: '',
+                password: '',
                 employee_code: '',
                 specialization: '',
                 status: 'pending'
@@ -416,6 +437,19 @@ const AdminTeachers = () => {
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             />
                         </div>
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                                {editingTeacher ? 'Change Password' : 'Password'}
+                            </label>
+                            <input
+                                required={!editingTeacher}
+                                type="password"
+                                placeholder={editingTeacher ? 'Leave blank to keep current' : 'Enter password'}
+                                className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all text-slate-700 dark:text-slate-200"
+                                value={formData.password}
+                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            />
+                        </div>
 
                         <div className="space-y-1">
                             <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Employee ID</label>
@@ -553,6 +587,63 @@ const AdminTeachers = () => {
                         </button>
                     </div>
                 </form>
+            </Modal>
+            {/* Teacher Selection Modal for "Manage Teacher" Action */}
+            <Modal
+                isOpen={isSelectTeacherModalOpen}
+                onClose={() => setIsSelectTeacherModalOpen(false)}
+                title="Select Teacher to Assign Subjects"
+            >
+                <div className="space-y-4">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                        <input
+                            type="text"
+                            placeholder="Find teacher..."
+                            className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all text-slate-700 dark:text-slate-200"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            autoFocus
+                        />
+                    </div>
+                    <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1">
+                        {filteredTeachers.length > 0 ? (
+                            filteredTeachers.map(teacher => (
+                                <button
+                                    key={teacher.id}
+                                    onClick={() => {
+                                        setIsSelectTeacherModalOpen(false);
+                                        handleManageSubjects(teacher);
+                                    }}
+                                    className="w-full flex items-center p-3 hover:bg-slate-50 dark:hover:bg-slate-900/50 rounded-xl transition-colors group text-left border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+                                >
+                                    <div className="h-10 w-10 flex-shrink-0 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center font-bold">
+                                        {teacher.user?.name?.charAt(0) || 'T'}
+                                    </div>
+                                    <div className="ml-3 flex-1">
+                                        <p className="font-bold text-sm text-slate-800 dark:text-white group-hover:text-indigo-600 transition-colors">
+                                            {teacher.user?.name}
+                                        </p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                                            {teacher.employee_code} • {teacher.specialization || 'General'}
+                                        </p>
+                                    </div>
+                                    <ChevronRight size={18} className="text-slate-300 group-hover:text-indigo-500" />
+                                </button>
+                            ))
+                        ) : (
+                            <p className="text-center text-slate-400 py-8 text-sm">No teachers found.</p>
+                        )}
+                    </div>
+                    <div className="flex justify-end pt-2">
+                        <button
+                            onClick={() => setIsSelectTeacherModalOpen(false)}
+                            className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-bold"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
             </Modal>
         </div>
     );

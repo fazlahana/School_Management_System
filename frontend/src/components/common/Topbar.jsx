@@ -17,7 +17,7 @@ const Topbar = ({ toggleSidebar, isSidebarOpen }) => {
     };
 
     return (
-        <div className={`fixed top-0 right-0 h-16 bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700 z-10 transition-all duration-300 ${isSidebarOpen ? 'left-64' : 'left-20'}`}>
+        <div className={`fixed top-0 right-0 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-sm border-b border-slate-200/50 dark:border-slate-800 z-10 transition-all duration-300 ${isSidebarOpen ? 'left-64' : 'left-20'}`}>
             <div className="h-full px-6 flex items-center justify-between">
                 <button onClick={toggleSidebar} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300">
                     <Menu size={24} />

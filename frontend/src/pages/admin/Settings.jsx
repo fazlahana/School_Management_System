@@ -43,11 +43,38 @@ const Settings = () => {
         }
     }, [settings]);
 
+    const fileInputRef = React.useRef(null);
+    const [logoFile, setLogoFile] = useState(null);
+    const [logoPreview, setLogoPreview] = useState(null);
+
+    const handleLogoClick = () => {
+        fileInputRef.current.click();
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setLogoFile(file);
+            setLogoPreview(URL.createObjectURL(file));
+        }
+    };
+
     const handleUpdate = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
-            await updateSettings(formData);
+            let dataToSend = formData;
+
+            if (logoFile) {
+                const formDataObj = new FormData();
+                Object.keys(formData).forEach(key => {
+                    formDataObj.append(key, formData[key] === null ? '' : formData[key]);
+                });
+                formDataObj.append('school_logo', logoFile);
+                dataToSend = formDataObj;
+            }
+
+            await updateSettings(dataToSend);
             toast.success('Institute profile updated');
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to update settings');
@@ -161,8 +188,17 @@ const Settings = () => {
                                                 Institute Logo*
                                             </span>
                                             <div className="flex items-center gap-8">
+                                                <input
+                                                    type="file"
+                                                    ref={fileInputRef}
+                                                    className="hidden"
+                                                    accept="image/*"
+                                                    onChange={handleFileChange}
+                                                />
                                                 <div className="w-32 h-32 rounded-full bg-slate-100 border-4 border-white shadow-lg overflow-hidden flex items-center justify-center flex-shrink-0 group relative">
-                                                    {settings?.school_logo ? (
+                                                    {logoPreview ? (
+                                                        <img src={logoPreview} alt="Preview" className="w-full h-full object-cover" />
+                                                    ) : settings?.school_logo ? (
                                                         <img src={`http://localhost:8000${settings.school_logo}`} alt="Logo" className="w-full h-full object-cover" />
                                                     ) : (
                                                         <div className="text-center p-2">
@@ -171,7 +207,11 @@ const Settings = () => {
                                                         </div>
                                                     )}
                                                 </div>
-                                                <button type="button" className="px-6 py-3 bg-indigo-500 text-white text-sm font-bold rounded-xl hover:bg-indigo-600 transition-colors flex items-center gap-2 shadow-lg shadow-indigo-200">
+                                                <button
+                                                    type="button"
+                                                    onClick={handleLogoClick}
+                                                    className="px-6 py-3 bg-indigo-500 text-white text-sm font-bold rounded-xl hover:bg-indigo-600 transition-colors flex items-center gap-2 shadow-lg shadow-indigo-200"
+                                                >
                                                     <CreditCard size={18} /> Change Logo
                                                 </button>
                                             </div>
@@ -289,7 +329,9 @@ const Settings = () => {
 
                                         <div className="flex flex-col items-center mt-12 mb-10">
                                             <div className="w-40 h-40 rounded-full bg-slate-50 flex items-center justify-center mb-6 overflow-hidden border-8 border-white shadow-2xl">
-                                                {settings?.school_logo ? (
+                                                {logoPreview ? (
+                                                    <img src={logoPreview} alt="Preview" className="w-full h-full object-cover" />
+                                                ) : settings?.school_logo ? (
                                                     <img src={`http://localhost:8000${settings.school_logo}`} alt="Logo" className="w-full h-full object-cover" />
                                                 ) : (
                                                     <div className="text-center p-2">

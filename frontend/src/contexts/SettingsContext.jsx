@@ -40,8 +40,23 @@ export const SettingsProvider = ({ children }) => {
 
     const updateSettings = async (newSettings) => {
         try {
-            await api.post('/admin/accounting/settings', newSettings);
-            setSettings(prev => ({ ...prev, ...newSettings }));
+            const config = {};
+            if (newSettings instanceof FormData) {
+                config.headers = { 'Content-Type': 'multipart/form-data' };
+            }
+            const response = await api.post('/admin/accounting/settings', newSettings, config);
+
+            if (response.data.settings) {
+                setSettings(response.data.settings);
+            } else {
+                // Fallback if server doesn't return settings (legacy)
+                if (!(newSettings instanceof FormData)) {
+                    setSettings(prev => ({ ...prev, ...newSettings }));
+                } else {
+                    // If it was FormData but no settings returned, we should probably fetch fresh settings
+                    fetchSettings();
+                }
+            }
             return true;
         } catch (error) {
             console.error('Failed to update settings', error);

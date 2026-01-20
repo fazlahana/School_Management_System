@@ -28,11 +28,13 @@ import {
     ArrowUpCircle,
     GraduationCap
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useNotification } from '../../hooks/useNotification';
 
 const AdminStudents = () => {
     const { toast, alert } = useNotification();
+    const location = useLocation();
+    const navigate = useNavigate();
     // Basic Data State
     const [students, setStudents] = useState([]);
     const [classes, setClasses] = useState([]);
@@ -93,6 +95,16 @@ const AdminStudents = () => {
         }, 500);
         return () => clearTimeout(timer);
     }, [searchTerm]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        if (params.get('action') === 'add') {
+            // Avoid re-opening if already open to prevent loops or unwanted behavior
+            if (!isModalOpen) {
+                handleOpenModal();
+            }
+        }
+    }, [location.search]);
 
     // Fetch Data
     useEffect(() => {
@@ -192,12 +204,20 @@ const AdminStudents = () => {
             if (editingStudent) {
                 await api.put(`/admin/students/${editingStudent.id}`, formData);
                 toast.success('Student updated successfully!', { id: loadToast });
+                setIsModalOpen(false);
+                fetchStudents();
             } else {
-                await api.post('/admin/students', formData);
+                const res = await api.post('/admin/students', formData);
                 toast.success('Student created successfully!', { id: loadToast });
+                setIsModalOpen(false);
+
+                // Redirect to the new student's profile
+                if (res.data && res.data.id) {
+                    navigate(`/admin/students/${res.data.id}`);
+                } else {
+                    fetchStudents();
+                }
             }
-            setIsModalOpen(false);
-            fetchStudents();
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to save student info.', { id: loadToast });
         }

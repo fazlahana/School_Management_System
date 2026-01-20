@@ -26,22 +26,31 @@ class SettingController extends Controller
     public function update(Request $request)
     {
         $validated = $request->validate([
-            'school_name' => 'required|string|max:255',
-            'school_email' => 'required|email|max:255',
+            'school_name' => 'nullable|string|max:255',
+            'school_email' => 'nullable|email|max:255',
             'school_phone' => 'nullable|string|max:20',
             'school_address' => 'nullable|string|max:500',
             'currency_symbol' => 'nullable|string|max:10',
             'academic_year' => 'nullable|string|max:20',
+            'school_logo' => 'nullable|image|max:2048', // 2MB Max
         ]);
 
+        if ($request->hasFile('school_logo')) {
+            $path = $request->file('school_logo')->store('school', 'public');
+            Setting::set('school_logo', '/storage/' . $path);
+        }
+
         foreach ($validated as $key => $value) {
-            if ($value !== null) {
+            if ($key !== 'school_logo' && $value !== null) {
                 Setting::set($key, $value);
             }
         }
 
-        $this->logActivity('updated_settings', null, null, $validated);
+        $this->logActivity('updated_settings', null, null, $request->except(['school_logo'])); // Don't log binary data
 
-        return response()->json(['message' => 'Settings updated successfully']);
+        return response()->json([
+            'message' => 'Settings updated successfully',
+            'settings' => Setting::all()->pluck('value', 'key')
+        ]);
     }
 }
