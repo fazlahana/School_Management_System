@@ -23,6 +23,7 @@ class TeacherController extends Controller
         $validated = $request->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users',
+            'password' => 'required|string|min:6',
             'employee_code' => 'required|unique:teachers',
             'specialization' => 'nullable|string',
             'status' => 'nullable|string|in:active,inactive,pending',
@@ -30,16 +31,13 @@ class TeacherController extends Controller
 
         DB::beginTransaction();
         try {
-            $verifyToken = \Illuminate\Support\Str::random(60);
-
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
-                'password' => null,
+                'password' => $validated['password'],
                 'role' => 'teacher',
-                'status' => 'pending',
-                'verify_token' => $verifyToken,
-                'verify_token_expires_at' => now()->addHours(24),
+                'status' => 'active',
+                'email_verified_at' => now(),
             ]);
 
             $teacher = Teacher::create([
@@ -51,8 +49,12 @@ class TeacherController extends Controller
 
             DB::commit();
 
-            // Send Activation Email
-            $user->notify(new \App\Notifications\AccountActivationNotification($verifyToken));
+            // Send Credentials Email
+            try {
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\TeacherCredentialsMail($user, $validated['password']));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Failed to send teacher credentials email: " . $e->getMessage());
+            }
 
             return response()->json($teacher->load('user'), 201);
         } catch (\Exception $e) {

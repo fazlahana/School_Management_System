@@ -36,7 +36,7 @@ class ClassController extends Controller
 
     public function show($id)
     {
-        return response()->json(ClassModel::with('teacher.user')->findOrFail($id));
+        return response()->json(ClassModel::with(['teacher.user', 'students.user'])->findOrFail($id));
     }
 
     public function update(Request $request, $id)

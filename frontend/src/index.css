@@ -3,16 +3,83 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --scroll-width: 8px;
+    --scroll-thumb: #cbd5e1;
+    --scroll-thumb-hover: #94a3b8;
+    --scroll-track: transparent;
+  }
+
+  .dark {
+    --scroll-thumb: #475569;
+    --scroll-thumb-hover: #64748b;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply antialiased text-slate-900 bg-white dark:bg-slate-900 dark:text-slate-100;
+    @apply antialiased text-slate-900 bg-slate-50 dark:bg-slate-900 dark:text-slate-100 font-sans;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  @keyframes modal-pop {
-    0% { opacity: 0; transform: scale(0.95) translateY(10px); }
-    100% { opacity: 1; transform: scale(1) translateY(0); }
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: var(--scroll-width);
+    height: var(--scroll-width);
   }
 
-  .animate-modal-pop {
-    animation: modal-pop 0.2s ease-out forwards;
+  ::-webkit-scrollbar-track {
+    background: var(--scroll-track);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--scroll-thumb);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--scroll-thumb-hover);
+    background-clip: content-box;
+  }
+
+  /* Text Selection */
+  ::selection {
+    @apply bg-blue-500/30 text-blue-900 dark:text-blue-100;
+  }
+
+  /* Input Autofill Fix */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    transition: background-color 5000s ease-in-out 0s;
+    -webkit-text-fill-color: inherit;
+    @apply text-slate-900 dark:text-white caret-blue-600;
   }
 }
+
+@layer components {
+  /* Glassmorphism Utilities */
+  .glass {
+    @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-white/20 dark:border-slate-700/30 shadow-sm;
+  }
+  
+  .glass-panel {
+    @apply bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50 shadow-xl;
+  }
+}
+
+@layer utilities {
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+}
+

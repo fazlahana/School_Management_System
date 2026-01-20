@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../../services/api';
 import Modal from '../../components/common/Modal';
 import { useNotification } from '../../hooks/useNotification';
@@ -17,6 +18,9 @@ import {
 
 const AdminClasses = () => {
     const { toast, alert } = useNotification();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const searchInputRef = React.useRef(null);
     const [classes, setClasses] = useState([]);
     const [teachers, setTeachers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -34,6 +38,20 @@ const AdminClasses = () => {
         fetchClasses();
         fetchTeachers();
     }, []);
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        if (params.get('action') === 'add') {
+            if (!isModalOpen) {
+                handleOpenModal();
+            }
+        } else if (params.get('action') === 'details_search') {
+            if (searchInputRef.current) {
+                searchInputRef.current.focus();
+                toast('Search for the class to view details.');
+            }
+        }
+    }, [location.search]);
 
     const fetchClasses = async () => {
         try {
@@ -138,6 +156,7 @@ const AdminClasses = () => {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                         <input
                             type="text"
+                            ref={searchInputRef}
                             placeholder="Search by class name..."
                             className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all text-slate-700 dark:text-slate-200"
                             value={searchTerm}
@@ -153,7 +172,10 @@ const AdminClasses = () => {
                         ))
                     ) : filteredClasses.length > 0 ? (
                         filteredClasses.map((cls) => (
-                            <div key={cls.id} className="bg-slate-50 dark:bg-slate-900 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all group">
+                            <div key={cls.id}
+                                className="bg-slate-50 dark:bg-slate-900 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all group cursor-pointer"
+                                onClick={() => navigate(`/admin/classes/${cls.id}`)}
+                            >
                                 <div className="p-6">
                                     <div className="flex items-start justify-between mb-4">
                                         <div className="p-3 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg">
@@ -161,13 +183,19 @@ const AdminClasses = () => {
                                         </div>
                                         <div className="flex gap-1">
                                             <button
-                                                onClick={() => handleOpenModal(cls)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleOpenModal(cls);
+                                                }}
                                                 className="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
                                             >
                                                 <Edit2 size={18} />
                                             </button>
                                             <button
-                                                onClick={() => handleDelete(cls.id)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDelete(cls.id);
+                                                }}
                                                 className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
                                             >
                                                 <Trash2 size={18} />
@@ -193,7 +221,13 @@ const AdminClasses = () => {
                                     </div>
                                 </div>
                                 <div className="px-6 py-3 bg-slate-100 dark:bg-slate-800/50 flex justify-end">
-                                    <button className="text-blue-600 dark:text-blue-400 text-sm font-semibold hover:underline flex items-center">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate(`/admin/classes/${cls.id}`);
+                                        }}
+                                        className="text-blue-600 dark:text-blue-400 text-sm font-semibold hover:underline flex items-center"
+                                    >
                                         View Details <Layout size={14} className="ml-1" />
                                     </button>
                                 </div>

@@ -2,18 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { Users, BookOpen, UserCheck, Calendar, Bell, TrendingUp, AlertCircle } from 'lucide-react';
+import { Users, BookOpen, UserCheck, Calendar, Bell, TrendingUp, AlertCircle, ChevronRight } from 'lucide-react';
 
 const StatCard = ({ title, value, icon: Icon, colorClass }) => (
-    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 flex items-center transition-transform hover:scale-[1.02] duration-300">
-        <div className={`p-4 rounded-xl ${colorClass} mr-4`}>
-            <Icon size={24} />
+    <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6 flex flex-col justify-between h-full hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-200 shadow-sm group">
+        <div className="flex items-start justify-between mb-4">
+            <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{title}</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mt-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{value}</h3>
+            </div>
+            <div className={`p-2.5 rounded-lg ${colorClass} bg-opacity-10 dark:bg-opacity-20`}>
+                <Icon size={20} />
+            </div>
         </div>
-        <div>
-            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">{title}</p>
-            <h3 className="text-2xl font-bold text-slate-800 dark:text-white leading-none mt-1">
-                {value}
-            </h3>
+        <div className="mt-auto pt-3 border-t border-slate-100 dark:border-slate-700/50 flex items-center text-xs text-slate-500 dark:text-slate-400">
+            <span className="text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
+                <TrendingUp size={12} /> +2.5%
+            </span>
+            <span className="ml-1.5">vs last month</span>
         </div>
     </div>
 );
@@ -46,235 +52,180 @@ const AdminDashboard = () => {
     const chartData = stats.revenue_trends || [];
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
+        <div className="space-y-6 max-w-[1600px] mx-auto">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-700">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800 dark:text-white leading-tight">Admin Dashboard</h1>
-                    <p className="text-slate-500 dark:text-slate-400">Welcome back, system administrator!</p>
+                    <h1 className="text-xl font-bold text-slate-900 dark:text-white">Dashboard Overview</h1>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Summary of school activities and financial metrics</p>
                 </div>
-                <div className="flex gap-2">
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-lg text-xs font-bold">
-                        <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
-                        Invoiced
-                    </div>
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-lg text-xs font-bold">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                        Collected
-                    </div>
+                <div className="flex items-center gap-3">
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-700 shadow-sm">
+                        {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    </span>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard
                     title="Total Students"
-                    value={loading ? '...' : stats.total_students}
+                    value={loading ? '-' : stats.total_students}
                     icon={Users}
-                    colorClass="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                    colorClass="text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/30"
                 />
                 <StatCard
                     title="Total Teachers"
-                    value={loading ? '...' : stats.total_teachers}
+                    value={loading ? '-' : stats.total_teachers}
                     icon={UserCheck}
-                    colorClass="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
+                    colorClass="text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-900/30"
                 />
                 <StatCard
-                    title="Total Classes"
-                    value={loading ? '...' : stats.total_classes}
+                    title="Active Classes"
+                    value={loading ? '-' : stats.total_classes}
                     icon={BookOpen}
-                    colorClass="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
+                    colorClass="text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-900/30"
                 />
                 <StatCard
-                    title="Total Exams"
-                    value={loading ? '...' : stats.total_exams}
+                    title="Scheduled Exams"
+                    value={loading ? '-' : stats.total_exams}
                     icon={Calendar}
-                    colorClass="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
+                    colorClass="text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-900/30"
                 />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Payment Trend Chart */}
-                <div className="lg:col-span-2 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 overflow-hidden relative">
-                    <div className="absolute top-0 right-0 p-8 opacity-[0.03] dark:opacity-[0.05] pointer-events-none">
-                        <TrendingUp size={200} />
-                    </div>
-
-                    <div className="flex items-center justify-between mb-8">
-                        <div className="flex items-center gap-2">
-                            <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg">
-                                <TrendingUp size={20} />
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                {/* Revenue Chart Section */}
+                <div className="xl:col-span-2 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
+                    <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50 rounded-t-lg">
+                        <div>
+                            <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Revenue Analytics</h2>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Monthly invoicing vs actual collections</p>
+                        </div>
+                        <div className="flex gap-4 text-xs font-medium">
+                            <div className="flex items-center gap-1.5">
+                                <span className="w-2 h-2 rounded-full bg-indigo-500"></span> Invoiced
                             </div>
-                            <div>
-                                <h2 className="text-lg font-bold text-slate-800 dark:text-white">Revenue Overview</h2>
-                                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Monthly invoicing vs collections</p>
+                            <div className="flex items-center gap-1.5">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Collected
                             </div>
                         </div>
                     </div>
 
-                    <div className="h-[300px] w-full mt-4" style={{ minHeight: '300px' }}>
+                    <div className="p-4 flex-1 min-h-[350px]">
                         {loading ? (
-                            <div className="h-full w-full flex items-center justify-center bg-slate-50 dark:bg-slate-900/50 rounded-lg animate-pulse">
-                                <p className="text-slate-400">Loading chart data...</p>
+                            <div className="h-full w-full flex items-center justify-center bg-slate-50 dark:bg-slate-900/50 rounded animate-pulse">
+                                <span className="text-sm text-slate-400">Loading metrics...</span>
                             </div>
-                        ) : chartData && chartData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%" minHeight={100}>
-                                <AreaChart data={chartData}>
+                        ) : chartData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="colorInvoiced" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.15} />
+                                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.1} />
                                             <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                                         </linearGradient>
                                         <linearGradient id="colorCollected" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.15} />
+                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
                                             <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.5} />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                     <XAxis
                                         dataKey="month"
                                         axisLine={false}
                                         tickLine={false}
-                                        tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 500 }}
+                                        tick={{ fill: '#64748b', fontSize: 11 }}
                                         dy={10}
                                     />
                                     <YAxis
                                         axisLine={false}
                                         tickLine={false}
-                                        tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 500 }}
-                                        tickFormatter={(value) => `$${value}`}
+                                        tick={{ fill: '#64748b', fontSize: 11 }}
+                                        tickFormatter={(val) => `$${val}`}
                                     />
                                     <Tooltip
                                         contentStyle={{
-                                            backgroundColor: '#1e293b',
-                                            border: 'none',
-                                            borderRadius: '12px',
-                                            color: '#fff',
-                                            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+                                            backgroundColor: '#fff',
+                                            borderColor: '#e2e8f0',
+                                            borderRadius: '6px',
+                                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                                            fontSize: '12px'
                                         }}
-                                        itemStyle={{ fontSize: '12px', fontWeight: 'bold' }}
-                                        cursor={{ stroke: '#6366f1', strokeWidth: 2, strokeDasharray: '5 5' }}
                                     />
-                                    <Area
-                                        type="monotone"
-                                        dataKey="invoiced"
-                                        name="Invoiced"
-                                        stroke="#6366f1"
-                                        strokeWidth={3}
-                                        fillOpacity={1}
-                                        fill="url(#colorInvoiced)"
-                                        activeDot={{ r: 6, strokeWidth: 0 }}
-                                    />
-                                    <Area
-                                        type="monotone"
-                                        dataKey="collected"
-                                        name="Collected"
-                                        stroke="#10b981"
-                                        strokeWidth={3}
-                                        fillOpacity={1}
-                                        fill="url(#colorCollected)"
-                                        activeDot={{ r: 6, strokeWidth: 0 }}
-                                    />
+                                    <Area type="monotone" dataKey="invoiced" name="Invoiced" stroke="#6366f1" strokeWidth={2} fillOpacity={1} fill="url(#colorInvoiced)" />
+                                    <Area type="monotone" dataKey="collected" name="Collected" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorCollected)" />
                                 </AreaChart>
                             </ResponsiveContainer>
                         ) : (
-                            <div className="h-full w-full flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-700">
-                                <p className="text-slate-400 italic">No financial activity recorded for the past 6 months.</p>
+                            <div className="h-full flex items-center justify-center text-slate-400 text-sm italic">
+                                No data available
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Exam Notifications */}
-                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-2">
-                            <Bell className="text-indigo-500" size={20} />
-                            <h2 className="text-lg font-bold text-slate-800 dark:text-white">Exam Alerts</h2>
+                {/* Right Column Grid */}
+                <div className="space-y-6">
+                    {/* Quick Management */}
+                    <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm p-4">
+                        <h3 className="text-xs font-semibold text-slate-900 dark:text-white uppercase tracking-wider mb-3">Quick Actions</h3>
+                        <div className="grid grid-cols-2 gap-3">
+                            <Link to="/admin/students?action=add" className="flex flex-col items-center justify-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all group shadow-sm hover:shadow text-center">
+                                <Users size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-blue-600 transition-colors mb-2" />
+                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">Add Student</span>
+                            </Link>
+                            <Link to="/admin/teachers?action=add" className="flex flex-col items-center justify-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 hover:bg-white dark:hover:bg-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 transition-all group shadow-sm hover:shadow text-center">
+                                <UserCheck size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-emerald-600 transition-colors mb-2" />
+                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">Add Teacher</span>
+                            </Link>
+                            <Link to="/admin/payments" className="flex flex-col items-center justify-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 hover:bg-white dark:hover:bg-slate-800 hover:border-indigo-500 dark:hover:border-indigo-500 transition-all group shadow-sm hover:shadow text-center">
+                                <TrendingUp size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-indigo-600 transition-colors mb-2" />
+                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">New Invoice</span>
+                            </Link>
+                            <Link to="/admin/classes" className="flex flex-col items-center justify-center p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 hover:bg-white dark:hover:bg-slate-800 hover:border-amber-500 dark:hover:border-amber-500 transition-all group shadow-sm hover:shadow text-center">
+                                <BookOpen size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-amber-600 transition-colors mb-2" />
+                                <span className="text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">Classes</span>
+                            </Link>
                         </div>
-                        <Link to="/admin/notifications" className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline">View All</Link>
                     </div>
-                    <div className="space-y-4">
-                        {loading ? (
-                            [1, 2, 3].map(n => (
-                                <div key={n} className="h-16 bg-slate-50 dark:bg-slate-900 animate-pulse rounded-lg"></div>
-                            ))
-                        ) : stats.upcoming_exams.length > 0 ? (
-                            stats.upcoming_exams.map((exam) => (
-                                <div key={exam.id} className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-indigo-300 transition-all group">
-                                    <div className="flex items-start justify-between">
-                                        <div>
-                                            <p className="font-bold text-slate-800 dark:text-white text-sm group-hover:text-indigo-600 transition-colors">
-                                                {exam.title}
-                                            </p>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                                                {exam.subject?.name} • {exam.class?.name}
-                                            </p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400">
+
+                    {/* Upcoming Events/Exams */}
+                    <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col h-full">
+                        <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
+                            <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                                <Bell size={16} className="text-slate-400" />
+                                Upcoming Events
+                            </h3>
+                            <Link to="/admin/notifications" className="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline">View All</Link>
+                        </div>
+                        <div className="divide-y divide-slate-100 dark:divide-slate-700/50">
+                            {loading ? (
+                                <div className="p-4 text-center text-xs text-slate-400">Loading...</div>
+                            ) : stats.upcoming_exams.length > 0 ? (
+                                stats.upcoming_exams.slice(0, 3).map(exam => (
+                                    <div key={exam.id} className="p-4 hover:bg-slate-50 dark:hover:bg-slate-700/20 transition-colors">
+                                        <div className="flex justify-between items-start mb-1">
+                                            <span className="text-sm font-medium text-slate-800 dark:text-slate-200">{exam.title}</span>
+                                            <span className="text-xs font-semibold text-slate-500 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-600">
                                                 {new Date(exam.exam_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                                            </p>
-                                            <p className="text-[10px] text-slate-400 mt-0.5">{exam.start_time}</p>
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400">
+                                            <span>{exam.subject?.name}</span>
+                                            <span>{exam.class?.name}</span>
                                         </div>
                                     </div>
+                                ))
+                            ) : (
+                                <div className="p-8 text-center bg-slate-50/30 dark:bg-slate-900/30">
+                                    <div className="inline-flex p-3 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-300 mb-2">
+                                        <Calendar size={20} />
+                                    </div>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">No upcoming exams.</p>
                                 </div>
-                            ))
-                        ) : (
-                            <div className="flex flex-col items-center justify-center py-10 text-center">
-                                <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-full mb-3 text-slate-300">
-                                    <AlertCircle size={32} />
-                                </div>
-                                <p className="text-slate-500 dark:text-slate-400 text-sm">No upcoming exams scheduled.</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-                    <div className="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-slate-800 dark:text-white">Recent Activity</h2>
-                        <Link to="/admin/notifications" className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline">View All</Link>
-                    </div>
-                    <div className="p-6 space-y-4">
-                        <div className="flex items-start gap-3">
-                            <div className="mt-1.5 h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
-                            <div>
-                                <p className="text-sm text-slate-700 dark:text-slate-300 leading-snug">System migration complete. All modules operational.</p>
-                                <p className="text-[10px] text-slate-400 uppercase font-bold mt-1 tracking-wider">Just Now</p>
-                            </div>
+                            )}
                         </div>
-                        <div className="flex items-start gap-3">
-                            <div className="mt-1.5 h-2 w-2 rounded-full bg-slate-300"></div>
-                            <div>
-                                <p className="text-sm text-slate-700 dark:text-slate-300 leading-snug">Database backup auto-scheduled for 03:00 AM.</p>
-                                <p className="text-[10px] text-slate-400 uppercase font-bold mt-1 tracking-wider">10 Minutes Ago</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-                    <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-                        <h2 className="text-lg font-bold text-slate-800 dark:text-white">Quick Management</h2>
-                    </div>
-                    <div className="p-6 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-4">
-                        <Link to="/admin/students" className="p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700/50 rounded-xl flex flex-col items-center gap-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group">
-                            <Users className="text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" />
-                            <span className="text-xs font-bold text-slate-700 dark:text-white">Add Student</span>
-                        </Link>
-                        <Link to="/admin/teachers" className="p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700/50 rounded-xl flex flex-col items-center gap-2 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all group">
-                            <UserCheck className="text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" />
-                            <span className="text-xs font-bold text-slate-700 dark:text-white">Add Teacher</span>
-                        </Link>
-                        <Link to="/admin/classes" className="p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700/50 rounded-xl flex flex-col items-center gap-2 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all group">
-                            <BookOpen className="text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform" />
-                            <span className="text-xs font-bold text-slate-700 dark:text-white">New Class</span>
-                        </Link>
-                        <Link to="/admin/exams" className="p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700/50 rounded-xl flex flex-col items-center gap-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group">
-                            <Calendar className="text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
-                            <span className="text-xs font-bold text-slate-700 dark:text-white">New Exam</span>
-                        </Link>
                     </div>
                 </div>
             </div>
