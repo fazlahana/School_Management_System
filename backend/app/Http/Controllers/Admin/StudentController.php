@@ -74,32 +74,43 @@ class StudentController extends Controller
 
     public function exportCSV()
     {
-        $students = Student::with(['user', 'class'])->get();
+        $fileName = 'students_export_' . date('Y-m-d') . '.csv';
         
-        $csvHeader = ['ID', 'Name', 'Email', 'Student Code', 'Class', 'Status', 'DOB', 'Guardian', 'Phone', 'Created At'];
-        $csvData = [];
-        $csvData[] = implode(',', $csvHeader);
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
 
-        foreach ($students as $student) {
-            $csvData[] = implode(',', [
-                $student->id,
-                '"' . ($student->user->name ?? '') . '"',
-                $student->user->email ?? '',
-                $student->student_code,
-                '"' . ($student->class->name ?? 'Unassigned') . '"',
-                $student->status,
-                $student->date_of_birth ?? '',
-                '"' . ($student->guardian_name ?? '') . '"',
-                $student->phone ?? '',
-                $student->created_at
-            ]);
-        }
+        $columns = ['ID', 'Name', 'Email', 'Student Code', 'Class', 'Status', 'DOB', 'Guardian', 'Phone', 'Created At'];
 
-        $csvString = implode("\n", $csvData);
-        
-        return response($csvString)
-            ->header('Content-Type', 'text/csv')
-            ->header('Content-Disposition', 'attachment; filename="students_export_' . date('Y-m-d') . '.csv"');
+        $callback = function() use($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            Student::with(['user', 'class'])->chunk(200, function($students) use($file) {
+                foreach ($students as $student) {
+                    fputcsv($file, [
+                        $student->id,
+                        $student->user->name ?? '',
+                        $student->user->email ?? '',
+                        $student->student_code,
+                        $student->class->name ?? 'Unassigned',
+                        $student->status,
+                        $student->date_of_birth ?? '',
+                        $student->guardian_name ?? '',
+                        $student->phone ?? '',
+                        $student->created_at
+                    ]);
+                }
+            });
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     public function bulkStatusChange(Request $request)
