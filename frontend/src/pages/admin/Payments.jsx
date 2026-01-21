@@ -85,9 +85,20 @@ const AdminPayments = () => {
     });
 
     useEffect(() => {
-        // Initial load for dashboard and required dropdown data
-        fetchSummary();
-        fetchClasses();
+        const loadInitialData = async () => {
+            setLoading(true);
+            try {
+                await Promise.all([
+                    fetchSummary(),
+                    fetchClasses()
+                ]);
+            } catch (error) {
+                console.error('Error loading initial payment data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadInitialData();
     }, []);
 
     useEffect(() => {

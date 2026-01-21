@@ -106,14 +106,29 @@ const AdminStudents = () => {
         }
     }, [location.search]);
 
-    // Fetch Data
+    // Fetch Initial Data
     useEffect(() => {
-        fetchStudents();
-    }, [page, perPage, debouncedSearch, filters, sort]);
-
-    useEffect(() => {
-        fetchClasses();
+        const loadInitialData = async () => {
+            // We don't set loading here because fetchStudents handles it
+            try {
+                await Promise.all([
+                    fetchStudents(),
+                    fetchClasses()
+                ]);
+            } catch (error) {
+                console.error('Initial data load failed:', error);
+            }
+        };
+        loadInitialData();
     }, []);
+
+    // Re-fetch students when filters/pagination change
+    useEffect(() => {
+        // Skip first load as it's handled by loadInitialData
+        if (loading === false) {
+            fetchStudents();
+        }
+    }, [page, perPage, debouncedSearch, filters, sort]);
 
     const fetchStudents = async () => {
         setLoading(true);

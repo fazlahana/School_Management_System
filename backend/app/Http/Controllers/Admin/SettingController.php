@@ -19,8 +19,9 @@ class SettingController extends Controller
 
     public function publicSettings()
     {
-        $settings = \App\Models\Setting::whereIn('key', ['school_name', 'school_logo'])->pluck('value', 'key');
-        return response()->json($settings);
+        return \Illuminate\Support\Facades\Cache::remember('public_settings', 3600, function() {
+            return \App\Models\Setting::whereIn('key', ['school_name', 'school_logo'])->pluck('value', 'key');
+        });
     }
 
     public function update(Request $request)
@@ -46,6 +47,8 @@ class SettingController extends Controller
             }
         }
 
+        \Illuminate\Support\Facades\Cache::forget('public_settings');
+        
         $this->logActivity('updated_settings', null, null, $request->except(['school_logo'])); // Don't log binary data
 
         return response()->json([

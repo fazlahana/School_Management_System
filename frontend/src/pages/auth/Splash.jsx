@@ -15,7 +15,7 @@ const Splash = () => {
         // Subtle delay for content entry
         const contentTimer = setTimeout(() => setShowContent(true), 100);
 
-        // Redirection timer - reduced to 800ms for better performance
+        // Redirection timer - reduced to 500ms for faster performance
         const redirectTimer = setTimeout(() => {
             if (isAuthenticated && user) {
                 if (user.role === 'admin') navigate('/admin/dashboard');
@@ -25,7 +25,7 @@ const Splash = () => {
             } else {
                 navigate('/login');
             }
-        }, 800);
+        }, 500);
 
         return () => {
             clearTimeout(contentTimer);

@@ -41,10 +41,24 @@ const AdminExams = () => {
     });
 
     useEffect(() => {
-        fetchExams();
-        fetchSubjects();
-        fetchClasses();
-        fetchTeachers();
+        const loadInitialData = async () => {
+            setLoading(true);
+            try {
+                // Fetch all data in parallel
+                await Promise.all([
+                    fetchExams(),
+                    fetchSubjects(),
+                    fetchClasses(),
+                    fetchTeachers()
+                ]);
+            } catch (error) {
+                console.error('Error loading initial exam data:', error);
+                toast.error('Failed to load some data. Please refresh.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadInitialData();
     }, []);
 
     const fetchExams = async () => {
@@ -53,8 +67,7 @@ const AdminExams = () => {
             setExams(response.data.data || []);
         } catch (error) {
             console.error('Error fetching exams:', error);
-        } finally {
-            setLoading(false);
+            throw error; // Rethrow to be caught by Promise.all
         }
     };
 
